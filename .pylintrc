@@ -1,0 +1,5 @@
+[MASTER]
+
+# Ignore les erreurs de Pylint concernant les imports absolus
+ignore = F0401
+

@@ -1,0 +1,7 @@
+TODO List:
+
+1. Implement user authentication system
+2. Refactor code for better readability
+4. Write unit tests for the features
+5. Write documentation
+6. Translate comments in English
