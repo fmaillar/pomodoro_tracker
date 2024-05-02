@@ -43,6 +43,10 @@ def somme_pomodoros(sessions):
 
     return somme_realises, somme_sous_estimation, somme_surestimation
 
+def diff_with_first_value(arr):
+    """Compute the differences between array elements while keeping the first value intact."""
+    arr_diff = np.diff(arr)
+    return np.insert(arr_diff, 0, arr[0])
 
 def visualiser_sessions():
     """Plot the graph."""
@@ -74,7 +78,7 @@ def visualiser_sessions():
     # Tracer la somme des pomodoros réalisés
     plt.plot(
         dates,
-        s_realises_list,
+        diff_with_first_value(s_realises_list),
         marker="o",
         color="green",
         label="Pomodoros réalisés",
@@ -83,7 +87,7 @@ def visualiser_sessions():
     # Tracer la somme des pomodoros sous-estimés
     plt.plot(
         dates,
-        s_sous_estimation_list,
+        diff_with_first_value(s_sous_estimation_list),
         marker="o",
         color="blue",
         label="Sous-estimation",
@@ -92,7 +96,7 @@ def visualiser_sessions():
     # Tracer la somme des pomodoros surestimés
     plt.plot(
         dates,
-        s_surestimation_list,
+        diff_with_first_value(s_surestimation_list),
         marker="o",
         color="red",
         label="Surestimation",
