@@ -22,7 +22,10 @@ def enregistrer_session(tache, duree, estimation_initiale, estimation_finale):
             json.dump([session], file1, ensure_ascii=False, indent=4)
     else:
         with open(JSON_NAME, mode="r+", encoding="utf-8") as file2:
-            data = json.load(file2)
+            try:
+                data = json.load(file2)
+            except json.decoder.JSONDecodeError:
+                data = []
             data.append(session)
             file2.seek(0)
             json.dump(data, file2, ensure_ascii=False, indent=4)
