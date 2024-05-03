@@ -101,12 +101,12 @@ class PomodoroTracker:
                 file.seek(0)
                 json.dump(data, file, ensure_ascii=False, indent=4)
 
-    def visualiser_sessions(self, bshow):
-        """Plot the graph."""
+    def calculer_donnees(self):
+        """Calculate data for plotting."""
         json_name = self.SAVE_JSON_FOLDER + f"sessions_pomodoro_{self.DATE}.json"
         if not os.path.exists(json_name):
             print("Aucune session disponible pour cette date.")
-            return
+            return None
 
         with open(json_name, mode="r", encoding="utf-8") as file:
             sessions = json.load(file)
@@ -133,34 +133,31 @@ class PomodoroTracker:
                 surestimation.append(np.nan)
                 sous_estimation.append(np.nan)
 
+        return pomodoros_effectues, pomodoros_realises, surestimation, sous_estimation, taches
+
+    def tracer_graphique(self, data, bshow):
+        """Plot the graph."""
+        if data is None:
+            return
+
+        pomodoros_effectues, pomodoros_realises, surestimation, sous_estimation, taches = data
+
         plt.figure(figsize=(10, 6))
 
-        # Tracer la ligne pour le nombre de pomodoros réalisés
-        plt.plot(
-            pomodoros_effectues,
-            pomodoros_realises,
-            marker="o",
-            color="green",
-            label="Pomodoros réalisés",
-        )
+        plots = [
+            (pomodoros_effectues, pomodoros_realises, 'green', 'Pomodoros réalisés'),
+            (pomodoros_effectues, surestimation, 'red', 'Surestimation'),
+            (pomodoros_effectues, sous_estimation, 'blue', 'Sous-estimation')
+        ]
 
-        # Tracer la ligne pour la surestimation
-        plt.plot(
-            pomodoros_effectues,
-            surestimation,
-            marker="o",
-            color="red",
-            label="Surestimation",
-        )
-
-        # Tracer la ligne pour la sous-estimation
-        plt.plot(
-            pomodoros_effectues,
-            sous_estimation,
-            marker="o",
-            color="blue",
-            label="Sous-estimation",
-        )
+        for x, y, color, label in plots:
+            plt.plot(
+                x,
+                y,
+                marker="o",
+                color=color,
+                label=label,
+            )
 
         plt.xlabel("Session Pomodoro")
         plt.ylabel("Nombre de Pomodoros")
@@ -188,6 +185,12 @@ class PomodoroTracker:
         plt.savefig(self.PLOT_NAME, dpi=200)
         if bshow:
             plt.show()
+
+    def visualiser_sessions(self, bshow):
+        """Calculate data and plot the graph."""
+        data = self.calculer_donnees()
+        self.tracer_graphique(data, bshow)
+
 
     def main(self):
         """Compute the main part of the script."""
