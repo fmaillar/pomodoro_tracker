@@ -9,7 +9,7 @@ timing or counting Pomodoros.
 1. Record daily activities performed using the Pomodoro Technique, with
 pomodoro_logger.py, json files are registered in json_folder/
 2. Track estimated Pomodoros versus actual Pomodoros completed, with
-   plot_pomodoro.py (day_to_day), png files are registered in png_folder/
+   pomodoro_logger.py (day_to_day), png files are registered in png_folder/
 3. Visualize activity data over time, with plot_pomodoro_global.py (bilan), png
    files are registered in png_folder/
 
