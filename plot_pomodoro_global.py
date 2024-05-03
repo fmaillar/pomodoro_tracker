@@ -10,12 +10,13 @@ import pomodoro_logger  # pylint: disable=F0401
 
 DATE_PLOT = datetime.now().strftime("%y-%m-%d")
 SAVE_PNG_FOLDER = "./png_folder/"
+SAVE_JSON_FOLDER = "./json_folder/"
 PLOT_NAME = SAVE_PNG_FOLDER + f"pomodoro_global_{DATE_PLOT}.png"
 
 
 def charger_sessions(date):
     """Load the pomodoros json sessions."""
-    filename = pomodoro_logger.SAVE_JSON_FOLDER + f"sessions_pomodoro_{date}.json"
+    filename = SAVE_JSON_FOLDER + f"sessions_pomodoro_{date}.json"
     if os.path.exists(filename):
         with open(filename, mode="r", encoding="utf-8") as file:
             sessions = json.load(file)
@@ -58,7 +59,7 @@ def visualiser_sessions():
     # Obtenez la liste des fichiers JSON dans le répertoire
     files = [
         file
-        for file in os.listdir(pomodoro_logger.SAVE_JSON_FOLDER)
+        for file in os.listdir(SAVE_JSON_FOLDER)
         if file.startswith("sessions_pomodoro_") and file.endswith(".json")
     ]
 
