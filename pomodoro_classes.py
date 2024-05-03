@@ -11,7 +11,7 @@ def color_title(labels, colors, textprops=None, a_x=None, y_0=1.013):
     Create a good colorfull title.
 
     Creates a centered title with multiple colors. Don't change axes limits
-    afterwards.
+    afterward.
     """
     precision = 10**-2
     if textprops is None:
