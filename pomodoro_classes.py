@@ -1,12 +1,18 @@
 """Group the two classes."""
+
 import json
 import os
 from datetime import datetime
+from typing import List, Tuple, Any
+
+from matplotlib import axes
 import matplotlib.pyplot as plt
 import numpy as np
 
 
-def color_title(labels, colors, textprops=None, a_x=None, y_0=1.013):
+def color_title(
+    labels: List[str], colors: List[str], textprops: dict = None, a_x: axes.Axes = None, y_0: float = 1.013
+):
     """
     Create a good colorfull title.
 
@@ -58,9 +64,9 @@ def color_title(labels, colors, textprops=None, a_x=None, y_0=1.013):
             break
 
 
-def get_date():
-    """Demander à l'utilisateur de choisir une date ou laisser vide pour aujourd'hui."""
-    date_input = input("Veuillez entrer une date au format yy-mm-dd (laissez vide pour aujourd'hui) : ")
+def get_date() -> str:
+    """Demander à l'utilisateur de choisir une date ou laisser vide."""
+    date_input = input("Veuillez entrer une date au format yy-mm-dd (vide pour aujourd'hui): ")
     if not date_input:
         return datetime.now().strftime("%y-%m-%d")
     else:
@@ -75,11 +81,11 @@ def get_date():
 class PomodoroTracker:
     def __init__(self, date):
         self.SAVE_JSON_FOLDER = "./json_folder/"
-        self.SAVE_PNG_FOLDER = './png_folder/'
+        self.SAVE_PNG_FOLDER = "./png_folder/"
         self.DATE = date
         self.PLOT_NAME = self.SAVE_PNG_FOLDER + f"pomodoro_{self.DATE}.png"
 
-    def enregistrer_session(self, tache, duree, estimation_initiale, estimation_finale):
+    def enregistrer_session(self, tache: str, duree: str, estimation_initiale: str, estimation_finale: str) -> None:
         """Register the session pomodoro."""
         json_name = self.SAVE_JSON_FOLDER + f"sessions_pomodoro_{self.DATE}.json"
         session = {
@@ -101,7 +107,7 @@ class PomodoroTracker:
                 file.seek(0)
                 json.dump(data, file, ensure_ascii=False, indent=4)
 
-    def calculer_donnees(self):
+    def calculer_donnees(self) -> Tuple[list[int], list[int], list[int | float], list[int | float], list[Any]] | None:
         """Calculate data for plotting."""
         json_name = self.SAVE_JSON_FOLDER + f"sessions_pomodoro_{self.DATE}.json"
         if not os.path.exists(json_name):
@@ -125,29 +131,33 @@ class PomodoroTracker:
 
             if pomodoros_realises[-1] < estimation_sum:
                 surestimation.append(estimation_sum)
-                sous_estimation.append(np.nan)  # Utiliser NaN pour les valeurs manquantes
+                # Utiliser NaN pour les valeurs manquantes
+                sous_estimation.append(np.nan)
             elif pomodoros_realises[-1] > estimation_sum:
                 sous_estimation.append(estimation_sum)
-                surestimation.append(np.nan)  # Utiliser NaN pour les valeurs manquantes
+                # Utiliser NaN pour les valeurs manquantes
+                surestimation.append(np.nan)
             else:
                 surestimation.append(np.nan)
                 sous_estimation.append(np.nan)
 
         return pomodoros_effectues, pomodoros_realises, surestimation, sous_estimation, taches
 
-    def tracer_graphique(self, data, bshow):
+    def tracer_graphique(
+        self, data: tuple[list[int], list[int], list[int | float], list[int | float], list[Any]] | None, bshow: bool
+    ) -> None:
         """Plot the graph."""
         if data is None:
             return
 
-        pomodoros_effectues, pomodoros_realises, surestimation, sous_estimation, taches = data
+        (pomodoros_effectues, pomodoros_realises, surestimation, sous_estimation, taches) = data
 
         plt.figure(figsize=(10, 6))
 
         plots = [
-            (pomodoros_effectues, pomodoros_realises, 'green', 'Pomodoros réalisés'),
-            (pomodoros_effectues, surestimation, 'red', 'Surestimation'),
-            (pomodoros_effectues, sous_estimation, 'blue', 'Sous-estimation')
+            (pomodoros_effectues, pomodoros_realises, "green", "Pomodoros réalisés"),
+            (pomodoros_effectues, surestimation, "red", "Surestimation"),
+            (pomodoros_effectues, sous_estimation, "blue", "Sous-estimation"),
         ]
 
         for x, y, color, label in plots:
@@ -201,9 +211,7 @@ class PomodoroTracker:
 
             self.enregistrer_session(tache, duree, estimation_initiale, estimation_finale)
 
-            continuer = (
-                    input("Voulez-vous enregistrer une autre session ? ([oui]/non) : ") or "oui"
-            )
+            continuer = input("Une autre session ? ([oui]/non) : ") or "oui"
             if continuer.lower() == "non" or continuer[0].lower() == "n":
                 break
 
@@ -213,7 +221,7 @@ class PomodoroAnalyzer:
         self.SAVE_JSON_FOLDER = "./json_folder/"
         self.SAVE_PNG_FOLDER = "./png_folder/"
 
-    def charger_sessions(self, date):
+    def charger_sessions(self, date: str) -> List:
         """Load the pomodoros json sessions."""
         filename = self.SAVE_JSON_FOLDER + f"sessions_pomodoro_{date}.json"
         if os.path.exists(filename):
@@ -224,7 +232,7 @@ class PomodoroAnalyzer:
         return []
 
     @staticmethod
-    def somme_pomodoros(sessions):
+    def somme_pomodoros(sessions: List) -> tuple[int, int, int]:
         """Estimate the total kind of pomodoros."""
         somme_realises = 0
         somme_sous_estimation = 0
@@ -244,12 +252,13 @@ class PomodoroAnalyzer:
         return somme_realises, somme_sous_estimation, somme_surestimation
 
     @staticmethod
-    def diff_with_first_value(arr):
-        """Compute the differences between array elements while keeping the first value intact."""
+    def diff_with_first_value(arr: np.array) -> np.array:
+        """Compute the differences between array elements
+        while keeping the first value intact."""
         arr_diff = np.diff(arr)
         return np.insert(arr_diff, 0, arr[0])
 
-    def calculer_donnees(self):
+    def calculer_donnees(self) -> tuple[list, list, list, list]:
         """Calculate the data for plotting."""
         dates = []
         s_realises_list = []
@@ -276,7 +285,7 @@ class PomodoroAnalyzer:
 
         return dates, s_realises_list, s_sous_estimation_list, s_surestimation_list
 
-    def tracer_graphique(self, x_data, y_data, color, label):
+    def tracer_graphique(self, x_data: np.array, y_data: np.array, color: str, label: str) -> None:
         """Plot a single line on the graph."""
         plt.plot(
             x_data,
@@ -286,7 +295,7 @@ class PomodoroAnalyzer:
             label=label,
         )
 
-    def visualiser_sessions(self):
+    def visualiser_sessions(self) -> None:
         """Plot the graph."""
         date_plot = datetime.now().strftime("%y-%m-%d")
         plot_name = self.SAVE_PNG_FOLDER + f"pomodoro_global_{date_plot}.png"
