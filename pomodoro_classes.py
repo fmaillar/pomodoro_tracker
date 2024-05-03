@@ -208,7 +208,6 @@ class PomodoroTracker:
                 break
 
 
-
 class PomodoroAnalyzer:
     def __init__(self):
         self.SAVE_JSON_FOLDER = "./json_folder/"
