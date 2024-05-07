@@ -8,7 +8,7 @@ if __name__ == "__main__":
         pomodoro_tracker = PomodoroTracker(date)
         pomodoro_tracker.main()
         tracer_session = input(
-            "Voulez-vous tracer la figure d'aujourd'hui' ? (oui/[non]) : "
+            f"Voulez-vous tracer la figure de la date {date}' ? (oui/[non]) : "
         ) or "non"
         if tracer_session.lower() == "oui" or tracer_session[0].lower() == "o":
             pomodoro_tracker.visualiser_sessions(False)
