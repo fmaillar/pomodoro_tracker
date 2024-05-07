@@ -114,15 +114,11 @@ def get_date() -> str:
 
 class PomodoroTracker:
     def __init__(self, date):
-        self.SAVE_JSON_FOLDER = "./json_folder/"
-        self.SAVE_PNG_FOLDER = "./png_folder/"
+        self.SAVE_JSON_FOLDER = os.getcwd() + r"\json_folder"
+        self.SAVE_PNG_FOLDER = os.getcwd() + r"\png_folder"
         self.DATE = date
-        self.JSON_NAME = os.path.join(
-            self.SAVE_JSON_FOLDER, f"sessions_pomodoro_{self.DATE}.json"
-        )
-        self.PLOT_NAME = os.path.join(
-            self.SAVE_PNG_FOLDER, f"pomodoro_{self.DATE}.png"
-        )
+        self.JSON_NAME = self.SAVE_JSON_FOLDER + f"\\sessions_pomodoro_{self.DATE}.json"
+        self.PLOT_NAME = self.SAVE_PNG_FOLDER + f"\\pomodoro_{self.DATE}.png"
 
     def enregistrer_session(
         self, tache: str, duree: str, est_init: str, est_fin: str
@@ -149,12 +145,13 @@ class PomodoroTracker:
 
     def calculer_donnees(self) -> DataTuple:
         """Calculate data for plotting."""
-        if not os.path.exists(self.JSON_NAME):
-            print("Aucune session disponible pour cette date.")
+        try:
+            with open(self.JSON_NAME, mode="r", encoding="utf-8") as file:
+                sessions = json.load(file)
+        except FileNotFoundError:
+            print(f"Aucune session disponible pour cette date: {self.DATE}.")
             return None
 
-        with open(self.JSON_NAME, mode="r", encoding="utf-8") as file:
-            sessions = json.load(file)
 
         pomo_r = []
         est = []
@@ -177,13 +174,19 @@ class PomodoroTracker:
             return
 
         pomo_e, pomo_r, est, taches = data
+        # breakpoint()
         plt.figure(figsize=(10, 6))
         plots = [
-            (pomo_e, pomo_r, "green", "Pomodoros réalisés"),
-            (pomo_e, est, "blue", "Pomodoros estimés"),
+            (pomo_e, est, "^", "blue", "Pomodoros estimés"),
+            (pomo_e, pomo_r, "o", "green", "Pomodoros réalisés"),
         ]
-        for x, y, color, label in plots:
-            plt.plot(x, y, marker="o", color=color, label=label)
+        for x, y, marker, color, label in plots:
+            plt.plot(x, y, marker=marker, color=color, label=label)
+
+        try:
+            MAX = max(pomo_r) + 1
+        except TypeError:
+            MAX = pomo_r +1
 
         plt.xlabel("Session Pomodoro")
         plt.ylabel("Nombre de Pomodoros")
@@ -191,8 +194,8 @@ class PomodoroTracker:
         colors = ["green", "blue", "black"]
         color_title(label_list, colors)
         plt.xticks(pomo_e, taches, rotation=45, ha="right")
-        plt.yticks(np.arange(0, max(*pomo_r) + 1, 1))
-        plt.ylim(0, max(*pomo_r) + 1)
+        plt.yticks(np.arange(0, MAX, 1))
+        plt.ylim(0, MAX)
         plt.grid(True)
         plt.savefig(self.PLOT_NAME, dpi=200)
         if bshow:
@@ -292,8 +295,8 @@ class PomodoroAnalyzer:
         dates, a_r, a_e = self.calculer_donnees()
 
         plt.figure(figsize=(10, 6))
-        plt.plot(dates, a_r, marker="o", color="green", label="Pomo réalisés")
         plt.plot(dates, a_e, marker="^", color="blue", label="Pomo estimés")
+        plt.plot(dates, a_r, marker="o", color="green", label="Pomo réalisés")
 
         plt.xlabel("Date")
         plt.ylabel("Somme des Pomodoros quotidiens")
